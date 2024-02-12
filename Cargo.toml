@@ -16,7 +16,7 @@ crate-type = ["cdylib", "rlib"]
 near-sdk = "5.0.0-alpha.2"
 
 [dev-dependencies]
-near-workspaces = { version = "0.10.0", features = ["unstable"] }
+near-workspaces = { version = "0.10.0", default-features = false, features = ["install", "unstable", "experimental"] }
 tokio = { version = "1.12.0", features = ["full"] }
 serde_json = "1"
 
@@ -29,3 +29,12 @@ debug = false
 panic = "abort"
 # Opt into extra safety checks on arithmetic operations https://stackoverflow.com/a/64136471/249801
 overflow-checks = true
+
+# patch near-workspaces with a local version located in ~/near-workspaces-rs
+[patch.crates-io]
+near-workspaces = { path = "../near-workspaces-rs/workspaces" }
+near-sdk = { path = "../near-sdk-rs/near-sdk" }
+cargo-near = { path = "../cargo-near/cargo-near" }
+
+[features]
+wasmcov = ["near-workspaces/wasmcov", "near-sdk/wasmcov"]

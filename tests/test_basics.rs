@@ -1,8 +1,15 @@
+use std::path::PathBuf;
+
 use serde_json::json;
 
 #[tokio::test]
 async fn test_contract_is_operational() -> Result<(), Box<dyn std::error::Error>> {
-    let sandbox = near_workspaces::sandbox().await?;
+    let sandbox = near_workspaces::sandbox()
+        .rpc_addr("http://localhost:3030")
+        .validator_key(near_workspaces::network::ValidatorKey::HomeDir(
+            PathBuf::from("/home/noah/.near"),
+        ))
+        .await?;
     let contract_wasm = near_workspaces::compile_project("./").await?;
 
     let contract = sandbox.dev_deploy(&contract_wasm).await?;
@@ -15,6 +22,7 @@ async fn test_contract_is_operational() -> Result<(), Box<dyn std::error::Error>
         .args_json(json!({"message": "test status"}))
         .transact()
         .await?;
+
     assert!(outcome.is_success());
 
     let user1_message_outcome = contract
